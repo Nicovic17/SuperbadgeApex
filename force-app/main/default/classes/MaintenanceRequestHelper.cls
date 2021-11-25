@@ -3,10 +3,10 @@ public with sharing class MaintenanceRequestHelper {
     
     public static void updateWorkOrders(Map<Id, Case> mantReqCasesRecived) {
         // TODO: Complete the method to update workorders
+
       //Create a new map of products id and the maintenance cycle numbers of days
-      
         
-        Map<Id, Integer> porductsMapCycle = new Map<Id, Integer>(); 
+        Map<Id, Integer> productMapCycle = new Map<Id, Integer>(); 
         
         Map<Id,Case> closedCasesM = new Map<Id,Case>(
                      [SELECT Id, Vehicle__c, Equipment__c, Equipment__r.Maintenance_Cycle__c,
@@ -30,11 +30,12 @@ public with sharing class MaintenanceRequestHelper {
             //If the product is not null and if the Main. Cycle is not null
             if ((oneEquipment != null) && (oneEquipment.Maintenance_Cycle__c != null)) {
                 //Then save de equipment ID and the Main. Cycle in to the map that create in te beagginig
-                porductsMapCycle.put(oneEquipment.Id, Integer.valueOf(oneEquipment.Maintenance_Cycle__c));               
+                productMapCycle.put(oneEquipment.Id, Integer.valueOf(oneEquipment.Maintenance_Cycle__c));               
             }
         }
-        Integer minimunCycleDays = porductsMapCycle.values()[0];
-        for(Integer oneCycle: porductsMapCycle.values()){
+        
+        Integer minimunCycleDays = productMapCycle.values()[0];
+        for(Integer oneCycle: productMapCycle.values()){
             //System.debug('The value inside oneCycle: ' + oneCycle);
             if(oneCycle < minimunCycleDays){
                 minimunCycleDays = oneCycle;
@@ -85,8 +86,8 @@ public with sharing class MaintenanceRequestHelper {
             
             newMAntReq.ParentId = oneCaseInRecivedMR.Id;
 
-            //If in the map porductsMapCycle exist the Id of the oneCaseInRecivedMR, then put those quantity of days plus to the day of today. Else, put the today date
-            newMantReq.Date_Due__c =  (porductsMapCycle.get(oneCaseInRecivedMR.Id) != null) ? (Date.today().addDays(Integer.valueOf(porductsMapCycle.get(oneCaseInRecivedMR.Id)))) : (Date.today().addDays(minimunCycleDays));
+            //If in the map productMapCycle exist the Id of the oneCaseInRecivedMR, then put those quantity of days plus to the day of today. Else, put the today date
+            newMantReq.Date_Due__c =  (productMapCycle.get(oneCaseInRecivedMR.Id) != null) ? (Date.today().addDays(Integer.valueOf(productMapCycle.get(oneCaseInRecivedMR.Id)))) : (Date.today().addDays(minimunCycleDays));
             
          newListOfCases.add(newMantReq); 
         }
